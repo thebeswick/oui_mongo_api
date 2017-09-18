@@ -16,6 +16,7 @@ def mqtt_setup():
 def on_message(mosq, obj, msg):
     macaddr = db.ouidata
     mac_input = str(msg.payload)
+    output = []
     if bool(re.match('^' + '[\:\-]'.join(['([0-9a-f]{2})']*6) + '$', mac_input.lower())):
         macAddr = re.sub('[:-]', '', msg.payload)
         vendorMACPrefix = macAddr[0:6].upper()
@@ -24,8 +25,11 @@ def on_message(mosq, obj, msg):
         if macquery:
             print macquery
             new_topic = "ouidata/respond/" + macAddr
-            outvalue = str(macquery)
-            mqttc.publish(new_topic, outvalue)
+#            outvalue = str(macquery)
+#            mqttc.publish(new_topic, outvalue)
+            output.append({"vendorOUI": macquery['vendorOUI'], "VendorName": macquery['vendorName']})
+            newoutput = str(output)
+            mqttc.publish(new_topic, newoutput)
         else:
             mqttc.publish("ouidata/respond/unknown", "Error: OUI not found in database")
     else:

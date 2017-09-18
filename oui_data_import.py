@@ -36,7 +36,7 @@ def import_oui_data():
     while pos < len(ven_arr):
         vendorPrefixMAC = ven_arr[pos][0]
         vendorName = ven_arr[pos][1].rstrip()
-        db.ouidata.insert({"vendorMAC": vendorPrefixMAC, "vendorName": vendorName})
+        db.ouidata.insert({"vendorOUI": vendorPrefixMAC, "vendorName": vendorName})
         pos += 1
 
 
