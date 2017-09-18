@@ -26,15 +26,20 @@ def get_all_mac_addresses():
 @app.route('/api/<macaddress>', methods=['GET'])
 def get_one_mac(macaddress=None):
     macaddr = mongo.db.ouidata
-    macAddr = re.sub('[:-]', '', macaddress)
-    vendorMACPrefix = macAddr[0:6].upper()
-    print vendorMACPrefix
-    macquery = macaddr.find_one({"vendorOUI": vendorMACPrefix})
     output = []
-    if macquery:
-        output.append({"vendorOUI" : macquery['vendorOUI'], "VendorName" : macquery['vendorName'] })
+    if bool(re.match('^' + '[\:\-]'.join(['([0-9a-f]{2})'] * 6) + '$', macaddress.lower())):
+        macAddr = re.sub('[:-]', '', macaddress)
+        vendorMACPrefix = macAddr[0:6].upper()
+        print vendorMACPrefix
+        macquery = macaddr.find_one({"vendorOUI": vendorMACPrefix})
+
+        if macquery:
+            output.append({"vendorOUI" : macquery['vendorOUI'], "VendorName" : macquery['vendorName'] })
+        else:
+            output = "unknown OUI"
     else:
-      output = "No such name"
+        output = "Not a valid MAC address"
+
     return jsonify({'result' : output})
 
 if __name__ == '__main__':
